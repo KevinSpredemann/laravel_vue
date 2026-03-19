@@ -15,7 +15,7 @@ defineProps<Props>();
     <Link
         :href="href"
         :tabindex="tabindex"
-        :method="method"
+        :method="method as any"
         :as="as"
         class="hover:decoration-current! text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out dark:decoration-neutral-500"
     >
