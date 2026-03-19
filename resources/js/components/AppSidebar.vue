@@ -18,12 +18,12 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Github Repo',
+        title: 'GitHub',
         href: 'https://github.com/laravel/vue-starter-kit',
         icon: Folder,
     },
     {
-        title: 'Documentation',
+        title: 'Documentação',
         href: 'https://laravel.com/docs/starter-kits',
         icon: BookOpen,
     },

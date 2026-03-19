@@ -24,7 +24,7 @@ const submit = () => {
 
 <template>
     <AuthBase title="Create an account" description="Enter your details below to create your account">
-        <Head title="Register" />
+        <Head title="Cadastrar" />
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">

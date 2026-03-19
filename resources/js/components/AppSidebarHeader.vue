@@ -2,10 +2,18 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItemType } from '@/types';
+import { computed } from 'vue';
 
-defineProps<{
-    breadcrumbs?: BreadcrumbItemType[];
-}>();
+const props = withDefaults(
+    defineProps<{
+        breadcrumbs?: BreadcrumbItemType[];
+    }>(),
+    {
+        breadcrumbs: () => [],
+    },
+);
+
+const hasBreadcrumbs = computed(() => props.breadcrumbs.length > 0);
 </script>
 
 <template>
@@ -14,7 +22,7 @@ defineProps<{
     >
         <div class="flex items-center gap-2">
             <SidebarTrigger class="-ml-1" />
-            <template v-if="breadcrumbs.length > 0">
+            <template v-if="hasBreadcrumbs">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <template v-for="(item, index) in breadcrumbs" :key="index">
