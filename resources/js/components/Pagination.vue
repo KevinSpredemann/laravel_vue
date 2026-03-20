@@ -5,6 +5,15 @@ import { Link } from '@inertiajs/vue3';
 // Importa a função computed do Vue para criar propriedades reativas derivadas
 import { computed } from 'vue';
 
+const formatLabel = (label: string) => {
+    return label
+        .replace(/&laquo;/g, '«')
+        .replace(/&raquo;/g, '»')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+};
+
 // Definir as props do componente, que são os links de paginação recebidos da controller
 const props = defineProps<{
     links: { url: string | null; label: string; active: boolean }[];
@@ -52,17 +61,16 @@ const paginatedLinks = computed(() => {
         <!-- v-html - Renderiza o HTML do label do link -->
         <Link
             v-for="link in paginatedLinks"
-            :key="link.label"
+            :key="link.url ?? link.label"
             :href="link.url ?? ''"
             class="pagination-link"
             :class="{
-                // Classe quando a página está ativa
                 'pagination-link-active': link.active,
-                // Classe quando o link não possui URL
                 'pagination-link-disabled': !link.url,
             }"
-            v-html="link.label"
-        />
+        >
+            {{ formatLabel(link.label) }}
+        </Link>
     </div>
 </template>
 
