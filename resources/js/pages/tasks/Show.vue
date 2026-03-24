@@ -77,11 +77,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <span class="detail-content">{{ props.task.name }}</span>
                 </p>
                 <p>
-                    <strong class="title-detail-content">Ano:</strong>
+                    <strong class="title-detail-content">Início:</strong>
                     <span class="detail-content">{{ props.task.started_at ? new Date(props.task.started_at).toLocaleString() : '' }}</span>
                 </p>
                 <p>
-                    <strong class="title-detail-content">Ano:</strong>
+                    <strong class="title-detail-content">Fim:</strong>
                     <span class="detail-content">{{ props.task.finished_at ? new Date(props.task.finished_at).toLocaleString() : '' }}</span>
                 </p>
                 <p>
