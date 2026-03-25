@@ -7,15 +7,30 @@ use App\Models\Task;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::orderBy('started_at', 'ASC')->paginate(3);
+        $tasks = Task::when($request->filled('name'),
+        fn($query) => $query->whereLike('name', '%' . $request->name . '%')
+        )
+        ->when($request->filled('started_at'),
+        fn($query) => $query->where('started_at', '>=', Carbon::parse($request->started_at))
+        )
+        ->when($request->filled('finished_at'),
+        fn($query) => $query->where('finished_at', '<=', Carbon::parse($request->finished_at))
+        )
+        ->orderBy('started_at', 'ASC')
+        ->paginate(10)
+        ->withQueryString();
 
         return Inertia::render('tasks/Index', [
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'name' => $request->name,
+            'finished_at' => $request->finished_at,
+            'started_at' => $request->started_at
         ]);
     }
 
