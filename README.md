@@ -91,25 +91,159 @@ Rodar o projeto local.
 composer run dev
 ```
 
-Alterar as credenciais do banco de dados no arquivo .env.
+## 🐳 Como rodar o projeto com Docker
+
+### Requisitos
+* Docker - Conferir a instalação: docker -v
+* Docker Compose - Conferir a instalação: docker compose version
+
+### Como rodar o projeto com Docker
+* Certifique-se de que o Docker está em execução (Docker Desktop aberto).
+
+Criar o arquivo docker-compose.yml na raiz do projeto:
 ```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=teste
-DB_USERNAME=root
-DB_PASSWORD=
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8
+    container_name: laravel_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
+networks:
+  laravel:
+
+volumes:
+  mysql_data:
 ```
 
-Executar as migrations para criar as tabelas e as colunas.
+Criar o arquivo Dockerfile na raiz do projeto:
 ```
+FROM php:8.2-fpm
+
+WORKDIR /var/www
+
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    zip \
+    unzip \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev
+
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+CMD php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Criar a pasta na docker/nginx com o arquivo default.conf
+```
+server {
+    listen 80;
+
+    root /var/www/public;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass app:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
+```
+
+Alterar as credenciais do banco de dados no arquivo .env
+```
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=root
+```
+
+Subir o container da aplicação:
+```
+docker compose up -d --build
+```
+
+Acessar o container da aplicação:
+```
+docker exec -it laravel_app bash
+```
+
+Instalar as dependências e configurar o Laravel:
+```
+composer install
+php artisan key:generate
 php artisan migrate
+php artisan db:seed
 ```
 
 Acessar a página criada com Laravel.
 ```
-http://127.0.0.1:8000
+http://localhost:8000
 ```
+
+Acessar o phpMyAdmin (gerenciar banco de dados):
+```
+http://localhost:8080
+```
+
+Login no phpMyAdmin:
+```
+Servidor: mysql
+Usuário: root
+Senha: root
+```
+
+
 
 Traduzir para português [Módulo pt-BR](https://github.com/lucascudo/laravel-pt-BR-localization)
 
