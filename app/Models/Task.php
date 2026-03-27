@@ -16,7 +16,12 @@ class Task extends Model
         "started_at",
     ];
     protected $casts = [
-        "finished_at" => "datetime",
-        "started_at" => "datetime",
+        "finished_at",
+        "started_at"
     ];
+
+    public function scopeFilter($query, $filter){
+        return $filter->apply($query);
+    }
 }
+
